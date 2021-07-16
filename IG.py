@@ -13,24 +13,23 @@ Reset = "\033[0m"
 
 
 class LockedIterator(object):
-        def __init__(self, it):
-            self.lock = threading.Lock()
-            self.it = it.__iter__()
+    def __init__(self, it):
+        self.lock = threading.Lock()
+        self.it = it.__iter__()
 
-        def __iter__(self):
-            return self
+    def __iter__(self):
+        return self
 
-        def __next__(self):
-            self.lock.acquire()
-            try:
-                return self.it.__next__()
-            finally:
-                self.lock.release()
+    def __next__(self):
+        self.lock.acquire()
+        try:
+            return self.it.__next__()
+        finally:
+            self.lock.release()
 
 
 class IG(object):
-    
-                
+
     def __init__(self, session, username):
         self.login_profile = str(session)
         self.target_profile = str(username)
@@ -39,7 +38,7 @@ class IG(object):
         self.insta.load_session_from_file(self.login_profile)
         self.profile = instaloader.Profile.from_username(self.insta.context, self.target_profile)
         self.diff()
-        
+
     def data(self):
 
         self.new_followees = set()
@@ -74,21 +73,22 @@ class IG(object):
 
         def read_old():
             if pathlib.Path(self.fpath+self.target_profile+"/following.json").is_file():
-                with open(self.fpath+self.target_profile+"/following.json") as user_data: 
-                    data = json.load(user_data) 
+                with open(self.fpath+self.target_profile+"/following.json") as user_data:
+                    data = json.load(user_data)
                 self.old_followees = set(data["followees"])
                 self.old_followers = set(data["followers"])
             else:
                 pass
-                
+
         def write_new():
-            pathlib.Path(self.fpath+self.target_profile).mkdir(parents=True,exist_ok=True)
+            pathlib.Path(
+                self.fpath+self.target_profile).mkdir(parents=True, exist_ok=True)
             following = {
                 "followers": list(self.new_followers),
                 "followees": list(self.new_followees)
-                }
+            }
             with open(self.fpath+self.target_profile+"/following.json", "w") as user_data:
-                json.dump(following, user_data, default=str ,indent=4)
+                json.dump(following, user_data, default=str, indent=4)
 
         fetch()
         write_new()
