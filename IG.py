@@ -11,8 +11,8 @@ Grey = "\033[1;30m"
 Red = "\033[1;31m"
 Reset = "\033[0m"
 
-class IG(object):
-    class LockedIterator(object):
+
+class LockedIterator(object):
         def __init__(self, it):
             self.lock = threading.Lock()
             self.it = it.__iter__()
@@ -26,9 +26,12 @@ class IG(object):
                 return self.it.__next__()
             finally:
                 self.lock.release()
+
+
+class IG(object):
+    
                 
     def __init__(self, session, username):
-
         self.login_profile = str(session)
         self.target_profile = str(username)
         self.fpath = str(pathlib.Path(__file__).parent.absolute())+"/profiles/"
@@ -47,11 +50,11 @@ class IG(object):
         def fetch():
 
             def fetch_followers():
-                for name in self.LockedIterator(self.profile.get_followers()):
+                for name in LockedIterator(self.profile.get_followers()):
                     self.new_followers.add(name.username)
 
             def fetch_followees():
-                for name in self.LockedIterator(self.profile.get_followees()):
+                for name in LockedIterator(self.profile.get_followees()):
                     self.new_followees.add(name.username)
 
             threads = []
